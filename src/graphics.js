@@ -68,7 +68,7 @@ class GameDisplay {
         let blanks = GetBlanks(problem) / 4;
         let bottles = problem.bottles.length;
         if (colors.length + blanks == bottles) {
-            // 浣跨敤colors閲岄潰鐨勯鑹�
+            // 使用colors里面的颜色
             for (var color of colors) {
                 if (color.index > BLOCK_BLANK && color.count < 4) {
 
@@ -77,10 +77,10 @@ class GameDisplay {
             }
         }
         else {
-            // 鍘熷鍥句腑鐨勯鑹叉暟杩囧皯锛屼笉鑳戒娇鐢╟olors閲岄潰鐨勯鑹诧紝鐩存帴浣跨敤problem.cols閲岄潰鐨勯鑷�
+            // 原始图中的颜色数过少，不能使用colors里面的颜色，直接使用problem.cols里面的颜臿
             for (var i = BLOCK_BLANK + 1; i < problem.color.length; i++) {
                 if (this.getColorCount(i, colors) < 4) {
-                    // 鍙樉绀轰娇鐢ㄤ笉婊�4涓殑棰滆壊
+                    // 只显示使用不满4个的颜色
                     this.usedColor.push({ 'index': i, 'color': problem.color[i] });
                 }
             }
@@ -147,13 +147,13 @@ class GameDisplay {
             let x = (i % 3) * this.selectorSize;
             let y = Math.floor(i / 3) * this.selectorSize;
             if (i === 0) {
-                // 鏈煡鍧�
+                // 未知块
                 this.fillVialSegmentRect(ctx, x, y, x + this.selectorSize - 1, y + this.selectorSize - 1, 'black');
                 ctx.fillStyle = 'white'
                 ctx.fillText('?', x + this.selectorSize / 2, y + (this.selectorSize - 24) / 2);
             }
             else if (i === 1) {
-                // 绌哄潡
+                // 空块
                 this.fillVialSegmentRect(ctx, x, y, x + this.selectorSize - 1, y + this.selectorSize - 1, 'black');
             }
             else
@@ -168,7 +168,7 @@ class GameDisplay {
         this.correctColor = enable;
         this.color = color;
         this.showall = showall;
-        this.selector.style.visibility = 'hidden'; // 鍗充娇enable锛屼篃鍏堟妸浠ュ墠鏄剧ず鍑烘潵鐨勯鑹查€夋嫨绐楀彛缁欓殣钘忎簡
+        this.selector.style.visibility = 'hidden'; // 即使enable，也先把以前显示出来的颜色选择窗口给隐藏了
 	  }
 
     toChange = null;
@@ -199,17 +199,17 @@ class GameDisplay {
             let bottle = problem.bottles[pure.from];
             bottle.setTop(id);
             if (!CheckProblem(problem)) {
-                ShowStatus('<b>閫夋嫨棰滆壊鏈夎锛岄鑹茬粍鍚堜笉绗﹀悎瑕佹眰锛岃閲嶆柊閫夋嫨...');
+                ShowStatus('<b>选择颜色有误，颜色组合不符合要求，请重新选择...');
             }
             else {
-                ShowStatus('鏍规嵁缈诲嚭鐨勯鑹查噸鏂拌В棰橈紝璇风瓑寰�......');
+                ShowStatus('根据翻出的颜色重新解题，请等待......');
                 colorSelecting = false;
                 this.selector.style.visibility = 'hidden';
                 movingProblem = problem;
                 FixQuestionMark(movingProblem);
                 this.show(movingProblem);
 
-                // 鏍规嵁缈诲嚭鐨勯鑹诧紝鏇存柊鍘熷闂
+                // 根据翻出的颜色，更新原始问题
                 let orgBottle = orgProblem.bottles[pure.from];
                 orgBottle.setColor(bottle.m_blanks, id);
                 orgBottle.Update();
@@ -273,7 +273,7 @@ class GameDisplay {
             let color = bottle.getColor(i);
             let yoff = (i * 2 + 1) * dy;
             if (color < 0) {
-            		// 鏈瘑鍒嚭鏉ョ殑鍧楋紝鍐欎笂绾㈣壊鐨刋
+            		// 未识别出来的块，写上红色的X
                 this.ctx.fillStyle = 'red'
                 this.ctx.fillText('X', (x1 + x2) / 2, y + yoff + 0.5 * dy);
 						}            	
@@ -288,7 +288,7 @@ class GameDisplay {
 
         let color = bottle.getColor(3);
         if (color < 0) {
-        		// 鏈瘑鍒嚭鏉ョ殑鍧楋紝鍐欎笂绾㈣壊鐨刋
+        		// 未识别出来的块，写上红色的X
             this.ctx.fillStyle = 'red'
             this.ctx.fillText('X', (x1 + x2) / 2, y + 7.5 * dy);
         }

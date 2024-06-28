@@ -142,22 +142,22 @@ class Bottle
 		}
 	}
 
-	// 鏄惁鍙互鍊掑嚭
+	// 是否可以倒出
 	canPureOut()
 	{
-		return this.m_blanks < this.m_blocks && this.m_top != BLOCK_UNKNOWN ;	// 闈炵┖鐡�, 涓旈《閮ㄩ鑹插凡鐭ユ墠鍙€掑嚭
+		return this.m_blanks < this.m_blocks && this.m_top != BLOCK_UNKNOWN ;	// 非空瓶, 且顶部颜色已知才可倒出
 	}
 
-	// 鏄惁鍙互鍊掑叆
+	// 是否可以倒入
 	canPureIn(color)
 	{
 		if (this.empty())
 		{
-			return true;	// 绌虹摱褰撶劧鍙互鍊掑叆
+			return true;	// 空瓶当然可以倒入
 		}
 		else
 		{
-			return this.m_blanks > 0 && this.m_top == color;	// 鏈夌┖浣嶏紝涓旈《閮ㄩ鑹茬鍚堣鍊掑叆鐨勯鑹�
+			return this.m_blanks > 0 && this.m_top == color;	// 有空位，且顶部颜色符合要倒入的颜色
 		}
 	}
 
@@ -165,7 +165,7 @@ class Bottle
 	{
 		if (this.isSameColor())
 		{
-			// 鎶婁竴涓悓鑹茬摱鍊掑叆涓€涓┖鐡惰櫧鐒跺彲鎿嶄綔锛屼絾鏄釜搴熸搷浣�
+			// 把一个同色瓶倒入一个空瓶虽然可操作，但是个废操作
 			if (other.empty())	
 				return false;
 			
@@ -179,8 +179,8 @@ class Bottle
 
 	isSameColor()
 	{
-		if (this.m_top == BLOCK_BLANK) return true;	// 姝や箖绌虹摱锛屽綋鐒朵篃绠楀悓鑹�
-		if (this.m_top == BLOCK_UNKNOWN) return false;	// 椤堕儴鏈煡鍧楋紝褰撶劧涔熶笉鑳界畻鍚岃壊
+		if (this.m_top == BLOCK_BLANK) return true;	// 此乃空瓶，当然也算同色
+		if (this.m_top == BLOCK_UNKNOWN) return false;	// 顶部未知块，当然也不能算同色
 
 		let c = this.m_color[this.m_blocks-1];
 		for (var i = this.m_blocks - 2; i >= 0; i--)
@@ -206,7 +206,7 @@ class Bottle
 			}
 			other.m_top = top;
 			other.m_isOK = other.isOK();
-			this.m_isOK = false;	// 鍊掑嚭浜嗘按锛岃偗瀹氫笉婊′簡
+			this.m_isOK = false;	// 倒出了水，肯定不满了
 		}
 	}
 
@@ -222,11 +222,11 @@ class Bottle
 
 	//			this.setColor(this.m_blanks, BLOCK_BLANK);
 	//			this.m_blanks++;
-	//			this.m_isOK = false;	// 鍊掑嚭浜嗘按锛岃偗瀹氫笉婊′簡
+	//			this.m_isOK = false;	// 倒出了水，肯定不满了
 	//		}
 	//		else
 	//		{
-	//			// 閿欒
+	//			// 错误
 	//			return;
 	//		}
 	//		this.m_top = this.topColor();
@@ -246,7 +246,7 @@ class Bottle
 			this.setColor(this.m_blanks++, BLOCK_BLANK);
 		}
 		this.m_top = this.topColor();
-		this.m_isOK = false;	// 鍊掑嚭浜嗘按锛岃偗瀹氫笉婊′簡
+		this.m_isOK = false;	// 倒出了水，肯定不满了
 
 		other.m_top = other.topColor();
 		other.m_isOK = other.isOK();
@@ -298,11 +298,11 @@ function clone(obj)
 	return o;
 }
 
-// problem鍖呮嫭浠ヤ笅鎴愬憳
-//   rows锛屾樉绀虹殑琛屾暟
-//   cols, 鏁扮粍锛屾瘡琛屾樉绀虹殑鐡跺瓙鏁�
-//   color锛屾暟缁勶紝浣跨敤鐨勯鑹�
-//   bottles锛屾暟缁勶紝鎵€鏈夌殑鐡跺瓙锛孊ottle
+// problem包括以下成员
+//   rows，显示的行数
+//   cols, 数组，每行显示的瓶子数
+//   color，数组，使用的颜色
+//   bottles，数组，所有的瓶子，Bottle
 
 function GetColors(problem)
 {
@@ -400,7 +400,7 @@ function IsDuplicateProblem(problem) {
 function CheckProblem(problem)
 {
 	let blanks = GetBlanks(problem);
-	//if (blanks <= 0 || blanks % 4) return false;	// 娌℃湁绌轰綅锛屾垨鑰呯┖浣嶄笉鏄�4鐨勬暣鏁板€�
+	//if (blanks <= 0 || blanks % 4) return false;	// 没有空位，或者空位不是4的整数倍
 	
 	let bottles = GetFullBottles(problem);
 	let colors = GetColors(problem);
@@ -408,7 +408,7 @@ function CheckProblem(problem)
 
 	if (unknowns < 4)
 	{
-		// 鍙湁鏈煡鍧楀皬浜�4鏃讹紝鎵嶈兘妫€鏌ラ鑹叉€绘暟鏄惁鍚堥€�
+		// 只有未知块小于4时，才能检查颜色总数是否合适
 		//var colorCount = colors.length;
 		//if (colorCount + blanks / 4 != bottles) return false;
 
@@ -416,7 +416,7 @@ function CheckProblem(problem)
 		for (var color of colors)
 		{
 			if (color.count > 4) {
-				ShowStatus('鏈夐鑹茬殑鏁扮洰锛坽color.count}锛夊ぇ浜�4');
+				ShowStatus('有颜色的数目（{color.count}）大于4');
 				return false;
 			}
 			else
@@ -426,22 +426,22 @@ function CheckProblem(problem)
 		}
 		if (unknowns != lackColorBlocks)
 		{
-			ShowStatus('鏈煡棰滆壊鐨勫潡鏁扮洰涓嶅');
+			ShowStatus('未知颜色的块数目不对');
 			return false;
 		}
 	}
 	else
 	{
-		// 棰滆壊杩囧鏄剧劧鏄笉瀵圭殑
+		// 颜色过多显然是不对的
 		if (colors.length + Math.floor(blanks / 4) > bottles) return false;
 
 		var colorBlocks = 0;
 		for (var color of colors)
 		{
-			// 鍗曚釜棰滆壊鐨勫潡鏁颁笉鑳借秴杩�4
+			// 单个颜色的块数不能超过4
 			if (color.count > 4)
 			{
-				ShowStatus('鏈夐鑹茬殑鏁扮洰锛�${color.count}锛夊ぇ浜�4');
+				ShowStatus('有颜色的数目（${color.count}）大于4');
 				return false;
 			}
 			colorBlocks += color.count;
@@ -468,7 +468,7 @@ function cloneProblem(problem) {
 	return cloned;
 }
 
-// 妫€鏌ユ槸鍚﹀凡缁忓畬鎴�
+// 检查是否已经完成
 function IsSolved(problem)
 {
 	let size = problem.bottles.length;
@@ -506,7 +506,7 @@ function FindPossibleNext(problem, nextDeep)
 						let newProblem = cloneProblem(problem.problem);
 						newProblem.bottles[i].pureTo(newProblem.bottles[j]);
 						if (!IsDuplicateProblem(newProblem)) {
-							var pure = problem.pure.slice();//clone(problem.pure);	//鍔犻€�
+							var pure = problem.pure.slice();//clone(problem.pure);	//加速
 							pure.push({ 'from': i, 'to': j });
 							if (IsSolved(newProblem)) {
 								FinishPure(newProblem, pure);
@@ -567,7 +567,7 @@ function PrepareToEvaluation(problem)
 		pured = false;
 		for (var i = 0; i < bottles.length; i++) {
 			if (!bottles[i].m_isOK && bottles[i].isSameColor() && bottles[i].m_top != BLOCK_BLANK && bottles[i].m_top != BLOCK_UNKNOWN) {
-				// 鍚岃壊鏈弧鐡�
+				// 同色未满瓶
 				for (var j = 0; j < bottles.length; j++) {
 					if (i != j && bottles[j].m_top == bottles[i].m_top) {
 						problem.bottles[j].pureTo(problem.bottles[i]);
@@ -621,7 +621,7 @@ function FindPossibleNextWithUnknown(problem, nextDeep, best)
 							var pure = problem.pure.slice();
 							pure.push({ 'from': i, 'to': j });
 							if (newProblem.bottles[i].m_top == BLOCK_UNKNOWN) {
-								// 缈诲嚭浜�1涓湭鐭ュ潡
+								// 翻出了1个未知块
 								PrepareToEvaluation(newProblem);
 								var score = Evaluation(newProblem);
 								var oks = 0;
@@ -661,7 +661,7 @@ function FindMoreUnkonwnsDeep(problemList, best)
 function FixQuestionMark(problem) {
 	let unknowns = GetUnknowns(problem);
 	if (unknowns === 1) {
-		// 瀵逛簬鍙湁涓€涓棶鍙风殑锛屾槸鍙互鎵惧嚭鏉ュ畠搴旇鏄暐棰滆壊鐨勫摝
+		// 对于只有一个问号的，是可以找出来它应该是啥颜色的哦
 		let colors = GetColors(problem);
 		let colorUnknown = 0;
 		for (var color of colors) {
@@ -685,7 +685,7 @@ function FixQuestionMark(problem) {
 		return false;
 }
 
-// 鏈夊皯閲忛棶鍙凤紝璇曞浘鎵惧嚭涓€瀹氳兘瑙ｅ嚭鏉ョ殑
+// 有少量问号，试图找出一定能解出来的
 function TrySolve(problem)
 {
 	

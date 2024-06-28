@@ -30,22 +30,22 @@ class BottleLine
 };
 
 //let g_mitidalu_color = {
-//		"鏈煡": [156, 170, 170, 'rgba(156, 170, 170, 1)'],
-//		"绌�": [15, 41, 52, 'rgba(15, 41, 52, 0)'],
-//		"钃�": [12,	95,	215, 'rgba(12, 95, 215, 1)'],
-//		"缁�": [16,	97,	94, 'rgba(16,	97,	94, 1)'],
-//		"娴呯豢": [85, 198, 58, 'rgba(85, 198, 58, 1)'],
-//		"绾�": [189, 31, 24, 'rgba(189, 31, 24, 1)'],
-//		"绱�": [141, 56, 213, 'rgba(141, 56, 213, 1)'],
-//		"榛�": [239, 189, 13, 'rgba(239, 189, 13, 1)'],
-//		"鑲夎壊": [255, 209, 184, 'rgba(255, 209, 184, 1)'],
-//		"鐏�": [101, 102, 104, 'rgba(101, 102, 104, 1)'],
-//		"娴呰摑": [94, 170, 233, 'rgba(94, 170, 233, 1)'],
-//		"绮�": [236, 98, 127, 'rgba(236, 98, 127, 1)'],
-//		"姗�": [245, 145, 42, 'rgba(245, 145, 42, 1)'],
-//		"闈�": [73,	62,	198, 'rgba(73, 62, 198, 1)'],
-//		"妫�": [105, 31, 57, 'rgba(105, 31, 57, 1)'],
-//		"娴呯传": [222, 151, 224, 'rgba(222, 151, 224, 1)']
+//		"未知": [156, 170, 170, 'rgba(156, 170, 170, 1)'],
+//		"空": [15, 41, 52, 'rgba(15, 41, 52, 0)'],
+//		"蓝": [12,	95,	215, 'rgba(12, 95, 215, 1)'],
+//		"绿": [16,	97,	94, 'rgba(16,	97,	94, 1)'],
+//		"浅绿": [85, 198, 58, 'rgba(85, 198, 58, 1)'],
+//		"红": [189, 31, 24, 'rgba(189, 31, 24, 1)'],
+//		"紫": [141, 56, 213, 'rgba(141, 56, 213, 1)'],
+//		"黄": [239, 189, 13, 'rgba(239, 189, 13, 1)'],
+//		"肉色": [255, 209, 184, 'rgba(255, 209, 184, 1)'],
+//		"灰": [101, 102, 104, 'rgba(101, 102, 104, 1)'],
+//		"浅蓝": [94, 170, 233, 'rgba(94, 170, 233, 1)'],
+//		"粉": [236, 98, 127, 'rgba(236, 98, 127, 1)'],
+//		"橙": [245, 145, 42, 'rgba(245, 145, 42, 1)'],
+//		"青": [73,	62,	198, 'rgba(73, 62, 198, 1)'],
+//		"棕": [105, 31, 57, 'rgba(105, 31, 57, 1)'],
+//		"浅紫": [222, 151, 224, 'rgba(222, 151, 224, 1)']
 //};
 
 function IsSameColor(R, G, B, color, allowed_distance)
@@ -78,18 +78,18 @@ function GetColor(image, x, y, colors)
 			let R = pixel[0];
 			let G = pixel[1];
 			let B = pixel[2];
-			if (IsSameColor(R, G, B, colors["鏈煡"], 28))
+			if (IsSameColor(R, G, B, colors["未知"], 28))
 			{
-				// 闂彿
+				// 问号
 				unknownCount++;
 			}
-			else if (IsSameColor(R, G, B, colors["绌�"], 28))
+			else if (IsSameColor(R, G, B, colors["空"], 28))
 			{
 				blankCount++;
 			}
 			else if (R > 220 && G > 220 && B > 220)
 			{
-				// 鐤戜技瀹屾垚鐡剁殑鐧芥场娉�
+				// 疑似完成瓶的白泡泡
 				count--;
 			}
 			else
@@ -147,17 +147,17 @@ function GetBottle(image, rect, select)
 		let color = GetColor(image, x, y, select.color);
 		bottle.setColor(i, color);
 		//Rect rect(x - 1, y - 1, 3, 3);
-		// 瀹氫箟鐭╁舰鐨勫乏涓婅鍜屽彸涓嬭鐨勫潗鏍�  
-		let pt1 = new cv.Point(x-1, y-1); // 宸︿笂瑙掑潗鏍�  
-		let pt2 = new cv.Point(x+2, y+2); // 鍙充笅瑙掑潗鏍�  
+		// 定义矩形的左上角和右下角的坐标  
+		let pt1 = new cv.Point(x-1, y-1); // 左上角坐标  
+		let pt2 = new cv.Point(x+2, y+2); // 右下角坐标  
 
-		// 瀹氫箟鐭╁舰鐨勯鑹诧紝杩欓噷浣跨敤 BGR 鏍煎紡锛屼緥濡傝摑鑹� (255, 0, 0)  
-		let fillcolor = new cv.Scalar(0, 0, 255); // 钃濊壊  
+		// 定义矩形的颜色，这里使用 BGR 格式，例如蓝色 (255, 0, 0)  
+		let fillcolor = new cv.Scalar(0, 0, 255); // 蓝色  
 
-		// 瀹氫箟鐭╁舰鐨勭嚎鏉″帤搴︼紝-1 琛ㄧず濉厖鏁翠釜鐭╁舰  
+		// 定义矩形的线条厚度，-1 表示填充整个矩形  
 		let thickness = -1;
 
-		// 鍦� Mat 瀵硅薄涓婄粯鍒跺～鍏呯殑鐭╁舰  
+		// 在 Mat 对象上绘制填充的矩形  
 		cv.rectangle(image, pt1, pt2, fillcolor, thickness);
 	}
 	//bottle.m_colors = colors;
@@ -231,7 +231,7 @@ solver.init = function (src, select) {
 	var index = 0;
 	for (let key in select.color)
 	{
-		problem.color[index] = select.color[key][3];	// 鏈€鍚庝竴涓槸缁欑綉椤垫樉绀虹敤鐨�
+		problem.color[index] = select.color[key][3];	// 最后一个是给网页显示用的
 		index++;
 	}
 	problem.cols = new Array();
